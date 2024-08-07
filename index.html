@@ -8,7 +8,6 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background-color: #2e2e2e;
       margin: 0;
     }
     #videoPlayer {
@@ -18,27 +17,56 @@
       display: block;
     }
     @media (min-width: 768px) {
-  #videoPlayer {
-    height: 450px;
-  }
-}
+      #videoPlayer {
+        width: 60%;
+        height: 220px;
+      }
+    }
     #inputContainer {
+      position: relative;
       margin-bottom: 20px;
+      display: flex;
+      align-items: center;
     }
     #videoLinkInput {
       padding: 7px;
       border-radius: 1px;
-      width: 82%;
-      max-width: 480px;
+      width: calc(100% - 60px); /* Adjust width to account for trash icon */
+      max-width: 295px;
       margin-right: 10px;
     }
+    #trashIcon {
+      position: absolute;
+      right: 45px;
+      cursor: pointer;
+      color: gray;
+      transition: color 0.3s;
+    }
+    @media (min-width: 768px) {
+      #trashIcon  {
+        right: 60%;
+      }
+    }
+    #trashIcon.disabled {
+      color: lightgray;
+      cursor: not-allowed;
+    }
+    #trashIcon.clicked {
+     color: red; /* Warna merah saat diklik */
+    }
     #okButton {
-      padding: 8px;
+      padding: 7px 18px;
       border-radius: 2px;
       background-color: #264823d2;
+      margin-left: 25px;
       color: white;
       border: none;
       cursor: pointer;
+    }
+    @media (min-width: 768px) {
+      #okButton  {
+        margin-left: 30px;
+      }
     }
     #okButton:disabled {
       background-color: #cccccc;
@@ -49,6 +77,7 @@
     }
     .controlButton {
       padding: 8px;
+      width: 50px;
       border: 2px solid white;
       border-radius: 5px;
       background-color: transparent;
@@ -59,12 +88,11 @@
       justify-content: center;
       transition: background-color 0.3s, color 0.3s;
     }
-    
     @media (min-width: 768px) {
-  .controlButton {
-      padding: 10px;
-  }
-}
+      .controlButton {
+        padding: 10px;
+      }
+    }
     .controlButton i {
       font-size: 24px;
       color: white;
@@ -103,14 +131,11 @@
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
       pointer-events: auto;
     }
-    
-    /* CSS Desktop */
-@media (min-width: 768px) {
-   #modal {
-    top: 10%;
-  }
- }
-   
+    @media (min-width: 768px) {
+      #modal {
+        top: 10%;
+      }
+    }
     #modal p {
       margin: 0;
     }
@@ -139,6 +164,7 @@
 <body>
   <div id="inputContainer">
     <input type="text" id="videoLinkInput" placeholder="Masukkan link video di sini">
+    <i id="trashIcon" class="material-icons disabled">delete</i>
     <button id="okButton">OK</button>
   </div>
   <video id="videoPlayer" controls></video>
@@ -158,113 +184,138 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-    const videoPlayer = document.getElementById("videoPlayer");
-    const videoLinkInput = document.getElementById("videoLinkInput");
-    const okButton = document.getElementById("okButton");
-    const muteToggleBtn = document.getElementById("muteToggleBtn");
-    const speedToggleBtn = document.getElementById("speedToggleBtn");
-    const darkModeToggleBtn = document.getElementById("darkModeToggleBtn");
-    const darkOverlay = document.getElementById("darkOverlay");
-    const modal = document.getElementById("modal");
-    const notificationText = document.getElementById("notificationText");
-    const closeButton = document.getElementById("closeButton");
-    const modalOverlay = document.getElementById("modalOverlay");
+  const videoPlayer = document.getElementById("videoPlayer");
+  const videoLinkInput = document.getElementById("videoLinkInput");
+  const trashIcon = document.getElementById("trashIcon");
+  const okButton = document.getElementById("okButton");
+  const muteToggleBtn = document.getElementById("muteToggleBtn");
+  const speedToggleBtn = document.getElementById("speedToggleBtn");
+  const darkModeToggleBtn = document.getElementById("darkModeToggleBtn");
+  const darkOverlay = document.getElementById("darkOverlay");
+  const modal = document.getElementById("modal");
+  const closeButton = document.getElementById("closeButton");
+  const modalOverlay = document.getElementById("modalOverlay");
 
-    let isMuted = false;
-    let isDarkModeOn = false;
-    let isSpeedChanged = false;
-    let currentSpeed = 1; // Initialize with normal speed
-    const MAX_SPEED = 10000; // Set maximum speed
+  let isMuted = false;
+  let isDarkModeOn = false;
+  let isSpeedChanged = false;
+  let currentSpeed = 1; // Initialize with normal speed
+  const MAX_SPEED = 10000; // Set maximum speed
+  let videoPlaying = false;
 
-    okButton.addEventListener("click", function () {
-        const videoLink = videoLinkInput.value;
-        if (videoLink) {
-            const convertedLink = convertDropboxLink(videoLink);
-            videoLinkInput.value = convertedLink; // Update input field with converted link
-            videoPlayer.src = convertedLink;
-            videoPlayer.play();
-            applySpeed(currentSpeed); // Apply current speed settings when video starts
-            videoLinkInput.disabled = true;
-            okButton.disabled = true;
-            videoPlayer.addEventListener('ended', showEndNotification);
-        }
-    });
-
-    muteToggleBtn.addEventListener("click", function () {
-        isMuted = !isMuted;
-        videoPlayer.muted = isMuted;
-        muteToggleBtn.querySelector('i').textContent = isMuted ? 'volume_off' : 'volume_up';
-        muteToggleBtn.classList.toggle('soundOn', isMuted);
-    });
-
-    speedToggleBtn.addEventListener("click", function () {
-        if (isSpeedChanged) {
-            // Reset to normal speed
-            currentSpeed = 1;
-            isSpeedChanged = false;
-        } else {
-            // Increase speed by a factor of 10
-            currentSpeed *= 10;
-            if (currentSpeed > MAX_SPEED) currentSpeed = MAX_SPEED; // Ensure the rate doesn't exceed the maximum
-            isSpeedChanged = true;
-        }
-        applySpeed(currentSpeed);
-        speedToggleBtn.classList.toggle('speedOn', isSpeedChanged);
-    });
-
-    darkModeToggleBtn.addEventListener("click", function () {
-        toggleDarkMode();
-    });
-
-    darkOverlay.addEventListener("click", function () {
-        toggleDarkMode();
-    });
-
-    closeButton.addEventListener("click", function () {
-        hideModal();
-        modalOverlay.style.display = "none";
-        document.body.style.pointerEvents = "auto"; // Re-enable page interactions
-        okButton.disabled = false; // Re-enable the OK button
-        videoLinkInput.disabled = false; // Re-enable the video link input
-    });
-
-    function applySpeed(rate) {
-        videoPlayer.playbackRate = rate;
+  okButton.addEventListener("click", function () {
+    const videoLink = videoLinkInput.value;
+    if (videoLink) {
+      const convertedLink = convertDropboxLink(videoLink);
+      videoLinkInput.value = convertedLink; // Update input field with converted link
+      videoPlayer.src = convertedLink;
+      videoPlayer.play();
+      videoPlaying = true;
+      currentSpeed = 10; // Set initial speed
+      applySpeed(currentSpeed); // Apply speed settings
+      isSpeedChanged = true;
+      speedToggleBtn.classList.add('speedOn'); // Update speed icon
+      videoLinkInput.disabled = true;
+      okButton.disabled = true;
+      videoPlayer.addEventListener('ended', function () {
+        videoPlaying = false;
+        showEndNotification();
+      });
     }
+  });
 
-    function toggleDarkMode() {
-        isDarkModeOn = !isDarkModeOn;
-        document.body.style.backgroundColor = isDarkModeOn ? "#333" : "";
-        darkOverlay.style.display = isDarkModeOn ? "block" : "none";
-        darkModeToggleBtn.classList.toggle('darkOn', isDarkModeOn);
+  trashIcon.addEventListener("click", function () {
+    if (!videoPlaying) {
+      videoLinkInput.value = ""; // Clear the input field
+      videoLinkInput.disabled = false;
+      okButton.disabled = false;
+
+      // Add 'clicked' class to change color
+      trashIcon.classList.add('clicked');
+      
+      // Remove 'clicked' class after 500 ms
+      setTimeout(function() {
+        trashIcon.classList.remove('clicked');
+      }, 500);
     }
+  });
 
-    function showEndNotification() {
-        modalOverlay.style.display = "block";
-        modal.style.display = "block";
-        document.body.style.pointerEvents = "none"; // Disable page interactions
+  muteToggleBtn.addEventListener("click", function () {
+    isMuted = !isMuted;
+    videoPlayer.muted = isMuted;
+    muteToggleBtn.querySelector('i').textContent = isMuted ? 'volume_off' : 'volume_up';
+    muteToggleBtn.classList.toggle('soundOn', isMuted);
+  });
 
-        // Reset video settings
-        videoPlayer.muted = false;
-        isMuted = false;
-        muteToggleBtn.querySelector('i').textContent = 'volume_up';
-        muteToggleBtn.classList.remove('soundOn');
-
-        currentSpeed = 1;
-        applySpeed(currentSpeed);
-        isSpeedChanged = false;
-        speedToggleBtn.classList.remove('speedOn');
-        speedToggleBtn.querySelector('i').textContent = 'speed'; // Reset icon if needed
+  speedToggleBtn.addEventListener("click", function () {
+    if (isSpeedChanged) {
+      // Reset to normal speed
+      currentSpeed = 1;
+      isSpeedChanged = false;
+    } else {
+      // Increase speed by a factor of 10
+      currentSpeed *= 10;
+      if (currentSpeed > MAX_SPEED) currentSpeed = MAX_SPEED; // Ensure the rate doesn't exceed the maximum
+      isSpeedChanged = true;
     }
+    applySpeed(currentSpeed);
+    speedToggleBtn.classList.toggle('speedOn', isSpeedChanged);
+  });
 
-    function hideModal() {
-        modal.style.display = "none";
-    }
+  darkModeToggleBtn.addEventListener("click", function () {
+    toggleDarkMode();
+  });
 
-    function convertDropboxLink(link) {
-        return link.replace("www.dropbox.com", "dl.dropboxusercontent.com");
-    }
+  darkOverlay.addEventListener("click", function () {
+    toggleDarkMode();
+  });
+
+  closeButton.addEventListener("click", function () {
+    hideModal();
+    modalOverlay.style.display = "none";
+    document.body.style.pointerEvents = "auto"; // Re-enable page interactions
+    okButton.disabled = false; // Re-enable the OK button
+    videoLinkInput.disabled = false; // Re-enable the video link input
+  });
+
+  function applySpeed(rate) {
+    videoPlayer.playbackRate = rate;
+  }
+
+  function toggleDarkMode() {
+    isDarkModeOn = !isDarkModeOn;
+    document.body.style.backgroundColor = isDarkModeOn ? "#333" : "";
+    darkOverlay.style.display = isDarkModeOn ? "block" : "none";
+    darkModeToggleBtn.classList.toggle('darkOn', isDarkModeOn);
+  }
+
+  function showEndNotification() {
+    modalOverlay.style.display = "block";
+    modal.style.display = "block";
+    document.body.style.pointerEvents = "none"; // Disable page interactions
+
+    // Reset video settings
+    videoPlayer.muted = false;
+    isMuted = false;
+    muteToggleBtn.querySelector('i').textContent = 'volume_up';
+    muteToggleBtn.classList.remove('soundOn');
+
+    currentSpeed = 1;
+    applySpeed(currentSpeed);
+    isSpeedChanged = false;
+    speedToggleBtn.classList.remove('speedOn');
+    speedToggleBtn.querySelector('i').textContent = 'speed'; // Reset icon if needed
+  }
+
+  function hideModal() {
+    modal.style.display = "none";
+  }
+
+  function convertDropboxLink(link) {
+    return link.replace("www.dropbox.com", "dl.dropboxusercontent.com");
+  }
 });
+
 
   </script>
 </body>

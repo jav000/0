@@ -1,4 +1,4 @@
-  document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
   const videoPlayer = document.getElementById("videoPlayer");
   const videoLinkInput = document.getElementById("videoLinkInput");
   const trashIcon = document.getElementById("trashIcon");
@@ -24,12 +24,19 @@
       const convertedLink = convertDropboxLink(videoLink);
       videoLinkInput.value = convertedLink; // Update input field with converted link
       videoPlayer.src = convertedLink;
+
+      // Set speed and mute immediately
+      currentSpeed = 10; // Set initial speed
+      applySpeed(currentSpeed);
+      videoPlayer.muted = true; // Mute the video
+
       videoPlayer.play();
       videoPlaying = true;
-      currentSpeed = 10; // Set initial speed
-      applySpeed(currentSpeed); // Apply speed settings
       isSpeedChanged = true;
       speedToggleBtn.classList.add('speedOn'); // Update speed icon
+      muteToggleBtn.classList.add('soundOn'); // Update mute icon to reflect muted state
+      muteToggleBtn.querySelector('i').textContent = 'volume_off'; // Update icon to indicate muted
+
       videoLinkInput.disabled = true;
       okButton.disabled = true;
       videoPlayer.addEventListener('ended', function () {

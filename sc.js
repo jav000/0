@@ -24,19 +24,16 @@ document.addEventListener("DOMContentLoaded", function () {
       const convertedLink = convertDropboxLink(videoLink);
       videoLinkInput.value = convertedLink; // Update input field with converted link
       videoPlayer.src = convertedLink;
-
-      // Set speed and mute immediately
-      currentSpeed = 10; // Set initial speed
-      applySpeed(currentSpeed);
-      videoPlayer.muted = true; // Mute the video
-
       videoPlayer.play();
       videoPlaying = true;
+      currentSpeed = 10; // Set initial speed
+      applySpeed(currentSpeed); // Apply speed settings
+      videoPlayer.muted = true; // Mute the video
+      isMuted = true;
+      muteToggleBtn.querySelector('i').textContent = 'volume_off'; // Update mute icon
+      muteToggleBtn.classList.add('soundOn'); // Update mute button state
       isSpeedChanged = true;
       speedToggleBtn.classList.add('speedOn'); // Update speed icon
-      muteToggleBtn.classList.add('soundOn'); // Update mute icon to reflect muted state
-      muteToggleBtn.querySelector('i').textContent = 'volume_off'; // Update icon to indicate muted
-
       videoLinkInput.disabled = true;
       okButton.disabled = true;
       videoPlayer.addEventListener('ended', function () {
@@ -137,3 +134,4 @@ document.addEventListener("DOMContentLoaded", function () {
     return link.replace("www.dropbox.com", "dl.dropboxusercontent.com");
   }
 });
+``

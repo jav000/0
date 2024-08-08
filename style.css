@@ -1,0 +1,156 @@
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #2e2e2e;
+      padding: 20px;
+      margin: 0;
+    }
+    #videoPlayer {
+      width: 100%;
+      height: 190px;
+      margin: 20px 0;
+      display: block;
+    }
+    @media (min-width: 768px) {
+      #videoPlayer {
+        width: 40%;
+        height: 220px;
+      }
+    }
+    #inputContainer {
+      position: relative;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+    #videoLinkInput {
+      padding: 7px;
+      border-radius: 1px;
+      width: calc(100% - 60px); /* Adjust width to account for trash icon */
+      max-width: 295px;
+      margin-right: 10px;
+    }
+    #trashIcon {
+      position: absolute;
+      right: 60px;
+      cursor: pointer;
+      color: gray;
+      transition: color 0.3s;
+    }
+    @media (min-width: 768px) {
+      #trashIcon  {
+        right: 63%;
+      }
+    }
+    #trashIcon.disabled {
+      color: lightgray;
+      cursor: not-allowed;
+    }
+    #trashIcon.clicked {
+     color: red; /* Warna merah saat diklik */
+    }
+    #okButton {
+      padding: 7px 18px;
+      border-radius: 2px;
+      background-color: #264823d2;
+      margin-left: 25px;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    @media (min-width: 768px) {
+      #okButton  {
+        margin-left: 35px;
+        padding: 7px 20px;
+      }
+    }
+    #okButton:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    #controlButtons {
+      margin-top: 20px;
+    }
+    .controlButton {
+      padding: 8px;
+      width: 50px;
+      border: 2px solid white;
+      border-radius: 5px;
+      background-color: transparent;
+      cursor: pointer;
+      margin-right: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    @media (min-width: 768px) {
+      .controlButton {
+        padding: 10px;
+      }
+    }
+    .controlButton i {
+      font-size: 24px;
+      color: white;
+    }
+    .controlButton.soundOn i {
+      color: yellow;
+    }
+    .controlButton.speedOn i {
+      color: red;
+    }
+    .controlButton.darkOn i {
+      color: gray;
+    }
+    #darkOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 999;
+      cursor: pointer;
+    }
+    #modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.6);
+      border: 1px solid white;
+      padding: 30px;
+      color: red;
+      z-index: 1000;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      pointer-events: auto;
+    }
+    @media (min-width: 768px) {
+      #modal {
+        top: 10%;
+      }
+    }
+    #modal p {
+      margin: 0;
+    }
+    #closeButton {
+      padding: 10px;
+      background-color: #444444d2;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #modalOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      pointer-events: none;
+    }
+  

@@ -30,8 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
       applySpeed(currentSpeed); // Apply speed settings
       videoPlayer.muted = true; // Mute the video
       isMuted = true;
-      muteToggleBtn.querySelector('i').textContent = 'volume_off'; // Update mute icon
-      muteToggleBtn.classList.add('soundOn'); // Update mute button state
+      updateMuteIcon(); // Update mute icon
       isSpeedChanged = true;
       speedToggleBtn.classList.add('speedOn'); // Update speed icon
       videoLinkInput.disabled = true;
@@ -62,8 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
   muteToggleBtn.addEventListener("click", function () {
     isMuted = !isMuted;
     videoPlayer.muted = isMuted;
-    muteToggleBtn.querySelector('i').textContent = isMuted ? 'volume_off' : 'volume_up';
-    muteToggleBtn.classList.toggle('soundOn', isMuted);
+    updateMuteIcon(); // Update mute icon and class
   });
 
   speedToggleBtn.addEventListener("click", function () {
@@ -101,6 +99,12 @@ document.addEventListener("DOMContentLoaded", function () {
     videoPlayer.playbackRate = rate;
   }
 
+  function updateMuteIcon() {
+    const icon = muteToggleBtn.querySelector('i');
+    icon.textContent = isMuted ? 'volume_off' : 'volume_up';
+    muteToggleBtn.classList.toggle('soundOn', isMuted);
+  }
+
   function toggleDarkMode() {
     isDarkModeOn = !isDarkModeOn;
     document.body.style.backgroundColor = isDarkModeOn ? "#333" : "";
@@ -116,9 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Reset video settings
     videoPlayer.muted = false;
     isMuted = false;
-    muteToggleBtn.querySelector('i').textContent = 'volume_up';
-    muteToggleBtn.classList.remove('soundOn');
-
+    updateMuteIcon(); // Update mute icon
     currentSpeed = 1;
     applySpeed(currentSpeed);
     isSpeedChanged = false;
